@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>
+        <%= title %>
+    </title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body class="m-0 p-0 container-fluid">
+    <% if (message !='' ) { %>
+        <div class="position-fixed top-0 end-0 p-1" style="z-index: 9999; width: 220px;">
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success">
+                    <img src="/images/checked.png" class="rounded me-3" alt="..." style="width: 35px;height: 35px;">
+                    <strong class="fs-5 text-white">Notification</strong>
+                </div>
+                <div class="toast-body text-center fs-6 fw-bold">
+                    <%= message %>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var toast = new bootstrap.Toast(document.querySelector('.toast'));
+                toast.show();
+
+                // Automatically close the toast after 2 seconds (2000 milliseconds)
+                setTimeout(function () {
+                    toast.hide();
+                }, 2000);
+            });
+        </script>
+        <% } %>
+            <%- include('../inc/header') %>
+                <div class="m-4">
+                    <a href="/products" type="button" class="btn btn-add fw-medium float-end mb-2"
+                        data-bs-toggle="modal" data-bs-target="#addModal">Add</a>
+                    <div class="input-group">
+                        <span class="input-group-text col-md-1">Search</span>
+                        <input id="searchInput" type="text" class="form-control" placeholder="Product Name">
+                        <button id="searchButton" class="btn btn-add fw-medium">Search</button>
+                    </div>
+                    <% if(listProduct) {%>
+                        <table class="table table-hover table-bordered mt-2">
+                            <thead>
+                                <tr class="text-center">
+                                    <th class="text-primary col-md-3 sm-3 " scope="col">ID</th>
+                                    <th class="text-primary col-md-2 sm-2" scope="col">Image</th>
+                                    <th class="text-primary col-md-2 sm-2" scope="col">Name</th>
+                                    <th class="text-primary col-md-2 sm-2" scope="col">Price</th>
+                                    <th class="text-primary col-md-3 sm-3" scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% listProduct.forEach((item)=> {
+                                    %>
+
+                                    <tr class="align-middle text-center">
+                                        <td scope="row">
+                                            <%= item._id %>
+                                        </td>
+                                        <td>
+                                            <img src="uploads/<%= item.image %>" alt="Loading image..."
+                                                style="width: 100px; height: 100px;">
+                                        </td>
+                                        <td>
+                                            <%= item.name %>
+                                        </td>
+                                        <td>
+                                            <%= item.price %>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="/products/view/<%= item._id %>" class="btn btn-warning">View</a>
+                                            <button data-item-id="<%= item._id %>"
+                                                data-item-idC="<%= item.id_category %>"
+                                                data-item-name="<%= item.name %>"
+                                                data-item-description="<%= item.description %>"
+                                                data-item-price="<%= item.price %>" class="btn btn-success m-2"
+                                                data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+
+                                            <button data-item-id="<%= item._id %>" data-item-name="<%= item.name %>"
+                                                class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal">Delete</button>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                        <% }else{ %>
+                            <h3>Không có dữ liệu</h3>
+                            <% } %>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <p class="m-0">Showing:10/100 items</p>
+                                    <nav aria-label="Page navigation example" class="">
+                                        <ul class="pagination m-0">
+                                            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                </div>
+                <!-- Modal add -->
+                <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="addModalLabel">Add product</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="products/add" method="POST" enctype="multipart/form-data"
+                                class="was-validated">
+                                <div class="modal-body">
+                                    <div class="mb-1">
+                                        <label for="nameProduct" class="form-label">Name</label>
+                                        <input name="name" class="form-control" id="nameProduct"
+                                            placeholder="Enter the product name...." required></input>
+                                        <div class="invalid-feedback">
+                                            Please enter a product name with a minimum of 4 characters!
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="cateId">Category</label>
+                                        <select name="cateId" class="form-select mt-1" required
+                                            aria-label="Pick Category">
+                                            <option value="" selected disabled>Open this select menu</option>
+                                            <% categories.forEach(item=> { %>
+                                                <option value="<%= item._id %>">
+                                                    <%= item.name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                        <div class="invalid-feedback">Please choose one category!</div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="formFile" class="form-label">Image</label>
+                                        <input name="image" type="file" class="form-control" id="formFile"
+                                            aria-label="file example" required>
+                                        <div class="invalid-feedback">Please select the product image!</div>
+                                    </div>
+                                    <div class="form-floating mb-1">
+                                        <textarea name="description" class="form-control" id="descriptionProduct"
+                                            placeholder="Enter the product description...." required
+                                            style="height: 130px"></textarea>
+                                        <label for="descriptionProduct" class="form-label">Description</label>
+                                        <div class="invalid-feedback">
+                                            Please enter a product description with a minimum of 10 and maximun 200
+                                            characters !
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="priceProduct" class="form-label">Price</label>
+                                        <input name="price" type="number" class="form-control" id="priceProduct"
+                                            placeholder="Enter the product price...." required></input>
+                                        <div class="invalid-feedback">
+                                            Please enter a product price!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="editModalLabel">Edit product</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form id="editForm" method="POST" enctype="multipart/form-data" class="was-validated">
+                                <div class="modal-body">
+
+                                    <div class="mb-1">
+                                        <label for="nameProduct" class="form-label">Name</label>
+                                        <input name="name" class="form-control" id="nameProduct"
+                                            placeholder="Enter the product name...." required></input>
+                                        <div class="invalid-feedback">
+                                            Please enter a product name with a minimum of 4 characters!
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="cateId">Category</label>
+                                        <select name="cateId" class="form-select mt-1" required
+                                            aria-label="Pick Category">
+                                            <option value="" selected disabled>Open this select menu</option>
+                                            <% categories.forEach(item=> { %>
+                                                <option value="<%= item._id %>">
+                                                    <%= item.name %>
+                                                </option>
+                                                <% }) %>
+                                        </select>
+                                        <div class="invalid-feedback">Please choose one category!</div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="formFile" class="form-label">Image</label>
+                                        <input name="image" type="file" class="form-control" id="formFile"
+                                            aria-label="file example" required>
+                                        <div class="invalid-feedback">Please select the product image!</div>
+                                    </div>
+                                    <div class="form-floating mb-1">
+                                        <textarea name="description" class="form-control" id="descriptionProduct"
+                                            placeholder="Enter the product description...." required
+                                            style="height: 130px"></textarea>
+                                        <label for="descriptionProduct" class="form-label">Description</label>
+                                        <div class="invalid-feedback">
+                                            Please enter a product description with a minimum of 10 and maximun 200
+                                            characters !
+                                        </div>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="priceProduct" class="form-label">Price</label>
+                                        <input name="price" type="number" class="form-control" id="priceProduct"
+                                            placeholder="Enter the product price...." required></input>
+                                        <div class="invalid-feedback">
+                                            Please enter a product price!
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="deleteModalLabel">Delete product</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form action="products/delete" method="POST">
+                                <div class="modal-body">
+                                    Bạn chắc chắn muốn xóa?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                    <button type="submit" class="btn btn-primary">Yes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <%- include('../inc/footer') %>
+
+                    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+                        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+                        crossorigin="anonymous"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+                        integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+                        crossorigin="anonymous"></script>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const searchButton = document.getElementById("searchButton");
+                            const searchInput = document.getElementById("searchInput");
+                            const productList = document.querySelectorAll(".table tbody tr");
+
+                            searchButton.addEventListener("click", function () {
+                                const searchText = searchInput.value.toLowerCase();
+
+                                productList.forEach(product => {
+                                    const productName = product.querySelector("td:nth-child(3)").textContent.toLowerCase();
+
+                                    if (productName.includes(searchText)) {
+                                        product.style.display = "table-row";
+                                    } else {
+                                        product.style.display = "none";
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+
+                    <script>
+                        const editButtons = document.querySelectorAll('.btn.btn-success');
+                        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                        const editForm = document.getElementById('editForm');
+
+                        // Bắt sự kiện khi nút "Edit" được nhấn
+                        editButtons.forEach(button => {
+                            button.addEventListener('click', function () {
+                                // Lấy giá trị item_id và item_name từ thuộc tính dữ liệu (data attribute)
+                                const itemId = this.getAttribute('data-item-id');
+                                const itemName = this.getAttribute('data-item-name');
+                                const itemIdC = this.getAttribute('data-item-idC');
+                                const itemPrice = this.getAttribute('data-item-price');
+                                const itemDescription = this.getAttribute('data-item-description');
+
+                                // Truy xuất phần tử trong modal để cập nhật nội dung
+                                const modalBody = editModal._element.querySelector('.modal-body');
+                                const nameInput = editForm.querySelector('#nameProduct');
+                                const categoryInput = editForm.querySelector('[name="cateId"]'); // Thêm đoạn này để truy xuất đến menu thả xuống "Category"
+                                const priceInput = editForm.querySelector('#priceProduct');
+                                const descriptionInput = editForm.querySelector('#descriptionProduct');
+
+                                // Cập nhật nội dung modal và input với item_id và item_name tương ứng
+                                nameInput.value = itemName;
+                                priceInput.value = itemPrice;
+                                descriptionInput.value = itemDescription;
+
+                                // Thêm thuộc tính "selected" vào tùy chọn chính xác trong menu thả xuống "Category"
+                                const categoryOptions = categoryInput.querySelectorAll('option');
+                                categoryOptions.forEach(option => {
+                                    if (option.value === itemIdC) {
+                                        option.setAttribute('selected', 'selected');
+                                    } else {
+                                        option.removeAttribute('selected');
+                                    }
+                                });
+
+                                // Thay đổi giá trị của thuộc tính action của form khi nút "Edit" được nhấn
+                                editForm.action = `products/edit/${itemId}`;
+                            });
+                        });
+                    </script>
+
+
+                    <script>
+                        const deleteButtons = document.querySelectorAll('.btn.btn-danger');
+                        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                        const deleteForm = document.querySelector('form[action="products/delete"]');
+
+                        // Bắt sự kiện khi nút "Delete" được nhấn
+                        deleteButtons.forEach(button => {
+                            button.addEventListener('click', function () {
+                                // Lấy giá trị item_id từ thuộc tính dữ liệu (data attribute)
+                                const itemId = this.getAttribute('data-item-id');
+                                const itemName = this.getAttribute('data-item-name');
+                                // Truy xuất phần tử trong modal để cập nhật nội dung
+                                const modalBody = deleteModal._element.querySelector('.modal-body');
+                                // Cập nhật nội dung modal với item_id tương ứng
+                                modalBody.textContent = `Do you want to delete the product named "${itemName}"?`;
+                                // Thay đổi giá trị của thuộc tính action của form khi nút "Delete" được nhấn
+                                deleteForm.action = `products/delete/${itemId}`;
+                            });
+                        });
+                    </script>
+</body>
+
+
+</html>

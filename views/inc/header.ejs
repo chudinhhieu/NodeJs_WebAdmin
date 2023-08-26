@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-lg bg-body-secondary">
+    <div class="container-fluid">
+        <a href="/" class="navbar-brand col-md-2">
+            <img class="img-logo-header" src="/images/logo.png" alt="Ảnh lỗi">
+        </a>
+        <div class="collapse navbar-collapse col-md-8" id="navbarNavDropdown">
+            <ul class="w-100 navbar-nav d-flex justify-content-evenly">
+                <li class="nav-item">
+                    <a class="nav-link fw-medium fs-5 " aria-current="page" href="/">Home</a>
+                </li>   
+                <li class="nav-item">
+                    <a class="nav-link fw-medium fs-5" href="/categories">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-medium fs-5" href="/products">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link fw-medium fs-5" href="/user-management">User management</a>
+                </li>
+            </ul>
+        </div>
+        <!-- Dùng lớp "d-none d-md-block" để ẩn user-info khi ở kích cỡ điện thoại (nhỏ hơn "md") -->
+        <div class="user-info col-md-2">
+            <div class="dropdown">
+                <div class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img class="user-avatar" src="/images/avatar_default.png" alt="Avatar">
+                    Chu Đình Hiếu
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                
+                    <li><a class="dropdown-item" href="/login">Log out</a></li>
+                </ul>
+            </div>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>

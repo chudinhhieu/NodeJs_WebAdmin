@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="../css/app.css">
+</head>
+
+<body class="m-0 p-0 container-fluid">
+    <% if (message !='' ) { %>
+        <div class="position-fixed top-0 end-0 p-1" style="z-index: 9999; width: 220px;">
+            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header bg-success">
+                    <img src="/images/checked.png" class="rounded me-3" alt="..." style="width: 35px;height: 35px;">
+                    <strong class="fs-5 text-white">Notification</strong>
+                </div>
+                <div class="toast-body text-center fs-6 fw-bold">
+                    <%= message %>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var toast = new bootstrap.Toast(document.querySelector('.toast'));
+                toast.show();
+
+                // Automatically close the toast after 2 seconds (2000 milliseconds)
+                setTimeout(function () {
+                    toast.hide();
+                }, 2000);
+            });
+        </script>
+        <% } %>
+    <%- include('../inc/header') %>
+        <div class="m-4">
+            <a href="/user-management" type="button" class="btn btn-add fw-medium float-end mb-2" data-bs-toggle="modal"
+                data-bs-target="#addModal">Add</a>
+                <div class="input-group">
+                    <span class="input-group-text col-md-1">Search</span>
+                    <input id="searchInput" type="text" class="form-control" placeholder="UserName">
+                    <button id="searchButton" class="btn btn-add fw-medium">Search</button>
+                </div>
+            <% if(listUser) {%>
+                <table class="table table-hover table-bordered mt-2">
+                    <thead>
+                        <tr class="text-center">
+                            <th class="text-primary col-md-2" scope="col">ID</th>
+                            <th class="text-primary col-md-2" scope="col">Fullname</th>
+                            <th class="text-primary col-md-2" scope="col">Username</th>
+                            <th class="text-primary col-md-3" scope="col">Email</th>
+                            <th class="text-primary col-md-3" scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% listUser.forEach((item)=>{%>
+                            <tr class="align-middle text-center">
+                                <td scope="row">
+                                    <%= item._id %>
+                                </td>
+                                <td>
+                                    <%= item.fullname %>
+                                </td>
+                                <td>
+                                    <%= item.username %>
+                                </td>
+                                <td>
+                                    <%= item.email %>
+                                </td>
+                                <td class="text-center">
+                                    <a href="/user-management/view/<%= item._id %>" class="btn btn-warning">View</a>
+
+                                    <button 
+                                        data-item-id="<%= item._id %>" 
+                                        data-item-username="<%= item.username %>"
+                                        data-item-password="<%= item.password %>"
+                                        data-item-fullname="<%= item.fullname %>" 
+                                        data-item-email="<%= item.email %>"
+                                        class="btn btn-success m-2" data-bs-toggle="modal"
+                                        data-bs-target="#editModal">Edit</button>
+
+                                    <button 
+                                        data-item-id="<%= item._id %>" 
+                                        data-item-username="<%= item.username %>"
+                                        class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal">Delete</button>
+                                </td>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+                <% }else{ %>
+                    <h3>Không có dữ liệu</h3>
+                    <% } %>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="m-0">Showing:10/100 items</p>
+                            <nav aria-label="Page navigation example" class="">
+                                <ul class="pagination m-0">
+                                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+        </div>
+        <!-- Modal add -->
+        <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="addModalLabel">Add user</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="user-management/add" method="POST" class="was-validated">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="fullname" class="form-label">Fullname</label>
+                                <input name="fullname" class="form-control" id="fullname" placeholder="Enter the fullname...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  fullname with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input name="username" class="form-control" id="username" placeholder="Enter the username...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  username with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input name="password" type="password" class="form-control" id="password" placeholder="Enter the password...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  password with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input name="email" type="email" class="form-control" id="email" placeholder="Enter the email...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  email!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Modal edit -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="editModalLabel">Edit user</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" id="editForm" method="POST" class="was-validated">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="fullname" class="form-label">Fullname</label>
+                                <input name="fullname" class="form-control" id="fullname" placeholder="Enter the fullname...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  fullname with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input name="username" class="form-control" id="username" placeholder="Enter the username...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  username with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input name="password" type="password" class="form-control" id="password" placeholder="Enter the password...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  password with a minimum of 4 characters!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input name="email" type="email" class="form-control" id="email" placeholder="Enter the email...." required></input>
+                                <div class="invalid-feedback">
+                                   Please enter a  email!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+         <!-- Modal delete -->
+         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteModalLabel">Delete user</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="deleteForm" method="POST">
+                        <div class="modal-body">
+                            Bạn chắc chắn muốn xóa?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-primary">Yes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <%- include('../inc/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+                integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+                crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+                integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+                crossorigin="anonymous"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const searchButton = document.getElementById("searchButton");
+                        const searchInput = document.getElementById("searchInput");
+                        const CategoryList = document.querySelectorAll(".table tbody tr");
+
+                        searchButton.addEventListener("click", function () {
+                            const searchText = searchInput.value.toLowerCase();
+
+                            CategoryList.forEach(category => {
+                                const categoryName = category.querySelector("td:nth-child(3)").textContent.toLowerCase();
+
+                                if (categoryName.includes(searchText)) {
+                                    category.style.display = "table-row";
+                                } else {
+                                    category.style.display = "none";
+                                }
+                            });
+                        });
+                    });
+                </script>
+            <!-- Edit -->
+            <script>
+                const editButtons = document.querySelectorAll('.btn.btn-success');
+                const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                const editForm = document.getElementById('editForm');
+
+                // Bắt sự kiện khi nút "Edit" được nhấn
+                editButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        // Lấy giá trị item_id và item_name từ thuộc tính dữ liệu (data attribute)
+                        const itemId = this.getAttribute('data-item-id');
+                        const itemUserName = this.getAttribute('data-item-username');
+                        const itemPassword = this.getAttribute('data-item-password');
+                        const itemFullName = this.getAttribute('data-item-fullname');
+                        const itemEmail = this.getAttribute('data-item-email');
+
+                        // Truy xuất phần tử trong modal để cập nhật nội dung
+                        const modalBody = editModal._element.querySelector('.modal-body');
+                        const userNameInput = editForm.querySelector('#username');
+                        const passWordInput = editForm.querySelector('#password'); // Thêm đoạn này để truy xuất đến menu thả xuống "Category"
+                        const fullNameInput = editForm.querySelector('#fullname');
+                        const emailInput = editForm.querySelector('#email');
+
+                        // Cập nhật nội dung modal và input với item_id và item_name tương ứng
+                        userNameInput.value = itemUserName;
+                        passWordInput.value = itemPassword;
+                        fullNameInput.value = itemFullName;
+                        emailInput.value = itemEmail;
+
+                        // Thay đổi giá trị của thuộc tính action của form khi nút "Edit" được nhấn
+                        editForm.action = `user-management/edit/${itemId}`;
+                    });
+                });
+            </script>
+            
+            <!-- Delete -->
+            <script>
+                const deleteButtons = document.querySelectorAll('.btn.btn-danger');
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+                const deleteForm = document.getElementById('deleteForm');
+
+
+                // Bắt sự kiện khi nút "Delete" được nhấn
+                deleteButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        // Lấy giá trị item_id từ thuộc tính dữ liệu (data attribute)
+                        const itemId = this.getAttribute('data-item-id');
+                        const itemUserName = this.getAttribute('data-item-username');
+                        // Truy xuất phần tử trong modal để cập nhật nội dung
+                        const modalBody = deleteModal._element.querySelector('.modal-body');
+                        // Cập nhật nội dung modal với item_id tương ứng
+                        modalBody.textContent = `Do you want to delete the user username "${itemUserName}"?`;
+                        // Thay đổi giá trị của thuộc tính action của form khi nút "Delete" được nhấn
+                        deleteForm.action = `user-management/delete/${itemId}`;
+                    });
+                });
+            </script>
+</body>
+
+</html>
